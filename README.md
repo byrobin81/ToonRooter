@@ -1,7 +1,7 @@
 # ToonRooter
 
 ## What it does
-This application roots your Toon from a Raspberry Pi.
+This application roots your Toon from a Raspberry Pi or another device with a JTAG debugger attached.
 
 At the moment, the following is implemented:
  - Detection of the U-Boot version
@@ -29,6 +29,10 @@ you should be able to access a serial console on the Toon and check out what's w
 to enable SSH access. The rest of the application basically just opens an injection vector to make that
 possible.
 
+## I have a Toon 2 ##
+The new Toon 2 isn't rootable using this tool. There are just a few people who can help you root a toon 2.
+You can take a look at this forum post if you want to have your Toon 2 rooted: https://www.domoticaforum.eu/viewtopic.php?f=101&t=12162
+
 ## How to use it?
 
 Make sure there's no power going in to either of the devices, and double check the connections
@@ -53,6 +57,8 @@ Connect your Toon's debugging header to a Raspberry Pi according to the followin
 |  14  |  GND   |  9   |
 
 
+Check if you're running Raspbian Stretch or later. You can check this by running 
+`cat /etc/issue`, the response should be `Raspbian GNU/Linux 9 \n \l` or later.
 Then make sure the serial port on the Pi is enabled and the serial console is disabled
 using `raspi_config` and reboot if necessary. Install the dependencies mentioned in the
 [Dependencies](#dependencies)-section.
@@ -66,6 +72,25 @@ sudo python . --jtag-available
 ```
 
 Then reset your Toon and let the magic happen :)
+
+## It's not working!
+Please re-check your wiring. If you're sure the wiring is correct, try the command with 
+the `--output-level DEBUG` flag set and head over to 
+[this friendly forum](https://www.domoticaforum.eu/viewtopic.php?f=101&t=11999) where the
+issue has most likely already been solved. If not, post a reply and the active community
+will probably help you out.
+
+## But I don't have a Pi
+
+You should definitely get a Pi.
+
+However, if you're adamant that you want to root your Toon from another device and
+you have a JTAG debugger lying around that works with OpenOCD, you should be able to
+use this script without issue. Just put the configuration file for your debugger in the
+`assets/adapters` directory (make sure it has a `.cfg` extension) and pass the name
+of the file (without extension) to the script using the `--jtag-hardware` argument.
+I'm pretty sure Windows is not going to work though, so you should use a Linux
+(virtual) machine.
 
 ## Command line arguments
 
@@ -96,8 +121,12 @@ optional arguments:
                         encryption. Ignored if you've used --ssh-public-key
   --output-level INFO|DEBUG
                         The level of output to print to the console
-  --jtag-available      Indicates you have your Pi connected to your Toon's
-                        JTAG headers
+  --jtag-available      Indicates you have a JTAG debugger connected to your
+                        Toon's JTAG headers
+  --jtag-hardware TYPE  The JTAG debugger type that we're working with. The
+                        default is to autodetect the JTAG debugger (which
+                        currently only works on Raspberry Pi). Supported
+                        values are: auto, rpi1, rpi2, rpi3
   --dont-check-uboot    Don't check whether we can access the installer
                         version of U-Boot before using JTAG to start up the
                         custom one.
@@ -106,14 +135,16 @@ optional arguments:
                         include more files and do something with them.
   --dont-reboot-after   Don't reboot the Toon after rooting it. Use this if
                         you want to use the serial console after rooting
+  --uboot-only          Only boot to the u-boot environment for manual control
   --boot-only           Don't install the payload, just boot into the serial
                         console
 ```
 
 ## Dependencies
 
+- Raspbian Stretch (or later) if you're using a Pi
 - Python 2.7
-
+- pySerial 3.4 (or later)
 - OpenOCD from git (for newer Toons) (see [instructions](#install-openocd))
 
 ## Install OpenOCD
@@ -143,4 +174,4 @@ This application is based on instructions and software written by:
 - marcelr
 - klaphekje
 - rboers
-- other [domoticaforum.eu](https://www.domoticaforum.eu/viewforum.php?f=87) users
+- other [domoticaforum.eu](https://www.domoticaforum.eu/viewtopic.php?f=101) users
